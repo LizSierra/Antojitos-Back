@@ -71,12 +71,13 @@ app.post('/registrar', (req, res) => {
 
     let categoria = new Categoria(req.body);
 
+    console.log(categoria);
     Categoria.find({ 'strNombre': categoria.strNombre }).then((data) => {
         if (data.length > 0) {
             return res.status(400).json({
                 ok: false,
                 status: 400,
-                msg: 'El sector ya fue ingresado, favor registrar otro.',
+                msg: 'La categoria ya fue registrada, favor registrar otra.',
             });
         }
 
@@ -88,7 +89,7 @@ app.post('/registrar', (req, res) => {
                 return res.status(400).json({
                     ok: false,
                     status: 400,
-                    msg: 'Este tipo de salario ya existe'
+                    msg: 'Este tipo de categoria ya existe'
                 });
             }
 
@@ -97,7 +98,7 @@ app.post('/registrar', (req, res) => {
                     res.status(200).send({
                         estatus: '200',
                         err: false,
-                        msg: 'Success: Información insertada correctamente.',
+                        msg: 'Información insertada correctamente.',
                         cont: {
                             resp
                         }
@@ -106,7 +107,7 @@ app.post('/registrar', (req, res) => {
                     return res.status(400).json({
                         ok: false,
                         status: 400,
-                        msg: 'Error al registrar el sector',
+                        msg: 'Error al registrar la categoria',
                         err: Object.keys(err).length === 0 ? err.message : err
                     });
                 });
@@ -128,17 +129,18 @@ app.post('/registrar', (req, res) => {
 app.put('/modificar/:id', (req, res) => {
     let id = req.params.id;
 
-    const categoria = new Categoria({
-        'strNombre': req.body.strNombre,
-        'strDescripcion': req.body.strDescripcion
-    });
+    // const categoria = new Categoria({
+    //     'strNombre': req.body.strNombre,
+    //     'strDescripcion': req.body.strDescripcion
+    // });
 
-    Categoria.findOneAndUpdate({ '_id': id, $set: categoria })
+    let body = _.pick(req.body, ['strNombre', 'strDescripcion', 'blnActivo']);
+    Categoria.findByIdAndUpdate(id, body)
         .then((data) => {
             return res.status(200).json({
                 ok: true,
                 resp: 200,
-                msg: 'La ategoria se actualizo correctamente.',
+                msg: 'La categoria se actualizo correctamente.',
                 cont: data
             });
         })
